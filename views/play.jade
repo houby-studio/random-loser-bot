@@ -1,0 +1,84 @@
+extends layout
+
+block content
+  h1 Play against bots
+  h2 Start new game
+  form(action='/play', method='POST')
+    p
+      | Bot name: 
+      b #{session.botNickname}
+    p
+      | User Id: 
+      input(type='text', name='botUserId', value='#{session.botUserId || ""}', style={width: '100%'})
+    p
+      | User Token: 
+      input(type='text', name='botUserToken', value='#{session.botUserToken || ""}', style={width: '100%'})
+    input(type='submit', value='Start new game', name='newgame')
+    if gameStarted
+      p New game started!
+
+  h2 Get game status
+  form(action='/play', method='POST')
+    p
+      | Game Token: 
+      input(type='text', name='botUserId', value='#{session.gameToken || ""}', style={width: '100%'})
+    p
+      | User Token: 
+      input(type='text', name='botUserToken', value='#{session.botUserToken || ""}', style={width: '100%'})
+    input(type='submit', value='Get game status', name='getstatus')
+    if statusFetched
+      h3 Game status
+      if statusFetched.statusCode == 200
+        p Game state: Running.
+      else
+        p Game state: Ended.
+      if statusFetched.winnerId
+        if statusFetched.winnerId == session.botUserId
+          p You are WINNER!
+        else
+          p You are LOSER!
+      if statusFetched.actualPlayerId == session.botUserId
+        p Currently playing: You.
+      else
+        p Currently playing: Opponent.
+      if statusFetched.playerCrossId == session.botUserId
+        p You are playing crosses and you first.
+      else
+        p You are playing circles and you go second.
+      if statusFetched.coordinates
+        each move, i in statusFetched.coordinates
+          p #{i}. #{move.playerId} x:#{move.x} y:#{move.y}
+
+
+
+  h2 Play your move
+  form(action='/play', method='POST')
+    p
+      | Game Token: 
+      input(type='text', name='botUserId', value='#{session.gameToken || ""}', style={width: '100%'})
+    p
+      | User Token: 
+      input(type='text', name='botUserToken', value='#{session.botUserToken || ""}', style={width: '100%'})
+    p
+      | X: 
+      input(type='number', name='positionX', value='')
+    p
+      | Y: 
+      input(type='number', name='positionY', value='')
+    input(type='submit', value='Play your move', name='playmove')
+  if movePlayed
+    p Your move has been submited!
+  
+  h2 Get bot rolling
+  form(action='/play', method='POST')
+    p
+      | User Token: 
+      input(type='text', name='botUserToken', value='#{session.botUserToken || ""}', style={width: '100%'})
+    p 
+      input(type="radio", name="infinite", value="1", checked=true)
+      | Continuous
+      input(type="radio", name="infinite", value="0")
+      | Single game
+    input(type='submit', value='Let bot play', name='botplay')
+  p
+    a(href="/admin") Return to Administration

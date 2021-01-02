@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1 Register bot
+  if session.botUserId && session.botUserToken && session.botNickname && session.botEmail
+    h2 Bot already registered
+    p You have already created bot with the following details:
+    p Nickname: #{session.botNickname}
+    p E-mail: #{session.botEmail}
+    p User Id: #{session.botUserId}
+    p User Token: #{session.botUserToken}
+
+  h2 Submit new registration
+  form(action='/register', method='POST')
+    p
+      | nickname: 
+      input(type='text', name='nickname', value='')
+      |  email: 
+      input(type='email', name='email', value='')
+    input(type='submit', value='Submit')
+  p 
+    a(href="/admin") Return to Administration
